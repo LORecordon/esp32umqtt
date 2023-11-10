@@ -1,0 +1,5 @@
+{
+    station_id: string
+    nickname: string
+    state: int
+}
