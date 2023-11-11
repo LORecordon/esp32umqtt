@@ -10,10 +10,10 @@ class SensorInfrarrojo:
         estado = self.pin.value()
         time.sleep(0.25)
         if estado == 0:
-            print("Objeto detectado cerca del sensor")
+            #print("Objeto detectado cerca del sensor")
             return 0
         else:
-            print("No se detecta ningún objeto cerca del sensor")
+            #print("No se detecta ningún objeto cerca del sensor")
             return 1
 
 

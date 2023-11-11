@@ -20,12 +20,12 @@ class Station:
     def load(self, locker_id):
         if locker_id in list(self.lockers.keys()):
             return self.lockers[locker_id].operator_load()
-        return False
+        return "Locker Does Not Exist"
     
     def unload(self, locker_id):
         if locker_id in list(self.lockers.keys()):
             return self.lockers[locker_id].client_unload()
-        return False
+        return "Locker Does Not Exist"
     
     def changeState(self, locker_id, state):
         if locker_id in list(self.lockers.keys()):

@@ -9,8 +9,8 @@ class SensorMagnetico:
         estado = self.pin.value()
         time.sleep(0.25)
         if estado == 0:
-            print("Locker cerrado")
+            #print("Locker cerrado")
             return 0
         else:
-            print("Locker abierto")
+            #print("Locker abierto")
             return 1

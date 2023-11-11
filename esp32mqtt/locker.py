@@ -47,7 +47,7 @@ class Locker:
             self.state = 1
             self.servo.bajar()
             #send message
-            return False
+            return self.status()
         irvalue = self.deteccion_open(self.ir)
         if irvalue:
             print("Locker Loaded")
@@ -63,6 +63,8 @@ class Locker:
             self.servo.bajar()
         else:
             print("Locker not closed")
+        return self.status()
+        
 
     def client_unload(self):
         self.state = 4
@@ -74,7 +76,7 @@ class Locker:
             self.state = 3
             self.servo.bajar()
             #send message
-            return False
+            return self.status()
         print("Reading IR Sensor")
         irvalue = self.deteccion_closed(self.ir)
         if irvalue:
@@ -93,6 +95,7 @@ class Locker:
             self.servo.bajar()
         else:
             print("Locker not closed")
+        return self.status()
 
     
     def status(self):

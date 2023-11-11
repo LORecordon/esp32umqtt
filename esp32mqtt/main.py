@@ -10,10 +10,10 @@ from locker import Locker
 from station import Station
 
 # Create lockers
-l1 = Locker("0", 10, 20, 10, 13, 19, 33, 4)
+l1 = Locker("1", 10, 20, 10, 13, 19, 33, 4)
 
 # Create station
-S1 = Station("G5", [l1])
+S1 = Station("estacion1", [l1])
 
 
 
@@ -42,33 +42,15 @@ def control_led(value):
     else:
         print("Unknown command:", value)
 
-# Callback for incoming messages
-def on_message(topic, msg):
-    temp = msg.decode('utf-8')
-    temp = ujson.loads(temp)
-    topic = topic.decode('utf-8')
-    print("Received message:", temp)
-    if topic == "reservation":
-        if temp["station_id"] == S1.id:
-            print("Reservation message received")
-            S1.changeState(str(temp["nickname"]), 1)
-            print(S1.create_mesagge())
-    elif topic == "loading":
-        if temp["station_id"] == S1.id:
-            print("Loading message received")
-            S1.load(str(temp["nickname"]))
-    elif topic == "unloading":
-        if temp["station_id"] == S1.id:
-            print("Unloading message received")
-            S1.unload(str(temp["nickname"]))
+
     
 
         
     
 
 # Replace with your Wi-Fi credentials, MQTT credentials, and broker address
-wifi_ssid = "Brito 2.4"
-wifi_password = "brito2016"
+wifi_ssid = "WIFI GRATIS"
+wifi_password = "password"
 mqtt_broker = "5f065f6ce8da42d1abd6eab15ecdd41f.s2.eu.hivemq.cloud"
 mqtt_user = b"esp32"
 mqtt_password = b"Abcd1234"
@@ -84,6 +66,34 @@ print(client_id)
 
 # Instantiate the MQTTClient object
 client = MQTTClient("station", server='5f065f6ce8da42d1abd6eab15ecdd41f.s2.eu.hivemq.cloud', user="esp32", password="Abcd1234",  ssl=True, ssl_params=ssl_params)
+
+toRespond = None
+
+# Callback for incoming messages
+def on_message(topic, msg):
+    global S1, toRespond
+
+    temp = msg.decode('utf-8')
+    temp = ujson.loads(temp)
+    topic = topic.decode('utf-8')
+    print("Received message:", temp)
+    print(topic == "unloading")
+    if topic == "reservation":
+        if temp["station_id"] == S1.id:
+            print("Reservation message received")
+            S1.changeState(str(temp["nickname"]), 1)
+            print(S1.create_mesagge())
+    elif topic == "loading":
+        if temp["station_id"] == S1.id:
+            print("Loading message received")
+            response = S1.load(str(temp["nickname"]))
+            toRespond = response
+            
+    elif topic == "unloading":
+        if temp["station_id"] == S1.id:
+            print("Unloading message received")
+            respone = S1.unload(str(temp["nickname"]))
+            toRespond = ujson.dumps(respone)
 
 # Set the on_message callback
 client.set_callback(on_message)
@@ -104,16 +114,27 @@ def constant_messaging(client, station):
         time.sleep(5)
         message = station.create_mesagge()
         client.publish("info", str(message), qos=1)
-        print("Message sent")
 
 
 
 
 try:
-    _thread.start_new_thread(constant_messaging, (client, S1))
+    x = 0
     while True:
+        print("iu")
         time.sleep(0.5)
+        x+=1
+        if x == 10:
+            message = ujson.dumps(S1.create_mesagge())
+            client.publish("info", str(message), qos=1)
+            x = 0
         # Check for incoming messages
+        
+        if toRespond != None:
+            print("Responding with:", toRespond)
+            client.publish("response", str(toRespond), qos=1)
+            toRespond = None
+        
         client.check_msg()
 
 except KeyboardInterrupt:
