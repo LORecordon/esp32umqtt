@@ -109,6 +109,9 @@ class Locker:
             "nickname": self.nickname,
             "state": self.state,
             "is_open": self.servo.state,
-            "is_empty": isem
+            "is_empty": isem,
+            "height": self.height,
+            "width": self.width,
+            "length": self.length
         }
         return mydata

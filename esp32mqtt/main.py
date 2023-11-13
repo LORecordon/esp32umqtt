@@ -10,10 +10,12 @@ from locker import Locker
 from station import Station
 
 # Create lockers
-l1 = Locker("1", 10, 20, 10, 13, 19, 33, 4)
+l1 = Locker("1", 10, 20, 10, 26, 21, 25, 22)
+l2 = Locker("2", 10, 20, 10, 13, 19, 33, 4)
+l3 = Locker("3", 10, 20, 10, 27, 18, 32, 23)
 
 # Create station
-S1 = Station("estacion1", [l1])
+S1 = Station("good", [l1, l2, l3])
 
 
 
@@ -49,8 +51,8 @@ def control_led(value):
     
 
 # Replace with your Wi-Fi credentials, MQTT credentials, and broker address
-wifi_ssid = "WIFI GRATIS"
-wifi_password = "password"
+wifi_ssid = "Brito 2.4"
+wifi_password = "brito2016"
 mqtt_broker = "5f065f6ce8da42d1abd6eab15ecdd41f.s2.eu.hivemq.cloud"
 mqtt_user = b"esp32"
 mqtt_password = b"Abcd1234"
@@ -74,7 +76,11 @@ def on_message(topic, msg):
     global S1, toRespond
 
     temp = msg.decode('utf-8')
-    temp = ujson.loads(temp)
+    try:
+        temp = ujson.loads(temp)
+    except:
+        print("Not A Json Message, Recieved:", temp)
+        return
     topic = topic.decode('utf-8')
     print("Received message:", temp)
     print(topic == "unloading")
@@ -105,8 +111,9 @@ print('connected')
 client.subscribe(b"reservation/#", qos=1)
 client.subscribe(b"loading/#", qos=1)
 client.subscribe(b"unloading/#", qos=1)
+client.subscribe(b"testing/#", qos=1)
 # Publish a message
-client.publish(b"testing", b"hola desde MicroPython", qos=1)
+#client.publish(b"testing", b"hola desde MicroPython", qos=1)
 
 
 def constant_messaging(client, station):
@@ -119,21 +126,22 @@ def constant_messaging(client, station):
 
 
 try:
-    x = 0
+    x = 38
     while True:
-        print("iu")
         time.sleep(0.5)
+
         x+=1
-        if x == 10:
+        if x >= 40:
+            print("Creating and Sending Info Message")
             message = ujson.dumps(S1.create_mesagge())
             client.publish("info", str(message), qos=1)
             x = 0
-        # Check for incoming messages
+        #Check for incoming messages
         
-        if toRespond != None:
-            print("Responding with:", toRespond)
-            client.publish("response", str(toRespond), qos=1)
-            toRespond = None
+        #if toRespond != None:
+        #    print("Responding with:", toRespond)
+        #    client.publish("response", str(toRespond), qos=1)
+        #    toRespond = None
         
         client.check_msg()
 

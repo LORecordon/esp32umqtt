@@ -11,10 +11,10 @@ class Servo:
         self.pin.duty(110)
         time.sleep(1)
         self.pin.duty(0)
-        self.state = False
+        self.state = True
     
     def bajar(self):
         self.pin.duty(40)
         time.sleep(1)
         self.pin.duty(0)
-        self.state = True
+        self.state = False
