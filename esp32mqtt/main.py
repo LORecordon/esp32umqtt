@@ -34,8 +34,8 @@ def connect_wifi(ssid, password):
 
         
 
-wifi_ssid = "Brito 2.4"
-wifi_password = "brito2016"
+wifi_ssid = "WIFI GRATIS"
+wifi_password = "password"
 mqtt_broker = "5f065f6ce8da42d1abd6eab15ecdd41f.s2.eu.hivemq.cloud"
 mqtt_user = b"esp32"
 mqtt_password = b"Abcd1234"
@@ -72,13 +72,13 @@ def on_message(topic, msg):
         if temp["station_name"] == S1.id:
             print("Reservation message received")
             S1.changeState(str(temp["nickname"]), 1)
-    elif topic == "loading":
+    elif topic == "load":
         if temp["station_name"] == S1.id:
             print("Loading message received")
             response = S1.load(str(temp["nickname"]))
             toRespond = response
             
-    elif topic == "unloading":
+    elif topic == "unload":
         if temp["station_name"] == S1.id:
             print("Unloading message received")
             respone = S1.unload(str(temp["nickname"]))
@@ -92,8 +92,8 @@ client.connect()
 print('connected')
 # Subscribe to the desired topic
 client.subscribe(b"reservation/#", qos=1)
-client.subscribe(b"loading/#", qos=1)
-client.subscribe(b"unloading/#", qos=1)
+client.subscribe(b"load/#", qos=1)
+client.subscribe(b"unload/#", qos=1)
 client.subscribe(b"testing/#", qos=1)
 
 
