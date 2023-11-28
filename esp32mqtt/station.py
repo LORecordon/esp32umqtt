@@ -9,7 +9,8 @@ class Station:
 
     def create_mesagge(self):
         message = {
-            "station_id": self.id,
+            "station_name": self.id,
+            "address": "Universidad de los Andes",
             "lockers": []
         }
         for i in self.lockers.keys():

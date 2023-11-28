@@ -5,10 +5,10 @@ from servo import Servo
 import time
 
 class Locker:
-    def __init__(self, nickname, height, width, length, servoPin, irPin, magPin, ledPin):
+    def __init__(self, nickname, width, length, height, servoPin, irPin, magPin, ledPin, inverse=False):
         self.nickname = nickname
         self.state = 0
-        self.servo = Servo(servoPin)
+        self.servo = Servo(servoPin, inverse)
         self.ir = SensorInfrarrojo(irPin)
         self.mag = SensorMagnetico(magPin)
         self.led = Pin(ledPin, Pin.OUT)
@@ -16,6 +16,11 @@ class Locker:
         self.width = width
         self.length = length
         self.led.value(0)
+        print("Locker Created", self.nickname)
+        self.servo.levantar()
+        time.sleep(1)
+        self.servo.bajar()
+
 
 
 
@@ -38,7 +43,7 @@ class Locker:
         return False
 
     def operator_load(self):
-        self.state = 2
+        self.state = 3
         self.servo.levantar()
         print("Reading Mag Sensor")
         magvalue = self.deteccion_closed(self.mag)
@@ -51,7 +56,7 @@ class Locker:
         irvalue = self.deteccion_open(self.ir)
         if irvalue:
             print("Locker Loaded")
-            self.state = 3
+            self.state = 4
         else: 
             print("Locker not loaded")
             self.state = 1
@@ -73,7 +78,7 @@ class Locker:
         magvalue = self.deteccion_closed(self.mag)
         if not magvalue:
             print("Locker not opened")
-            self.state = 3
+            self.state = 4
             self.servo.bajar()
             #send message
             return self.status()
@@ -84,7 +89,7 @@ class Locker:
             self.state = 0
         else: 
             print("Locker not unloaded")
-            self.state = 3
+            self.state = 4
 
         time.sleep(2)
         print("Reading Mag Sensor")
@@ -110,8 +115,11 @@ class Locker:
             "state": self.state,
             "is_open": self.servo.state,
             "is_empty": isem,
-            "height": self.height,
-            "width": self.width,
-            "length": self.length
+            "size": str(self.width) + "x" + str(self.length) + "x" + str(self.height),
         }
         return mydata
+
+    def debug(self):
+        print("Locker:", self.nickname)
+        print("Mag Sensor:", self.mag.leer_sensor())
+        print("IR Sensor:", self.ir.leer_sensor())
